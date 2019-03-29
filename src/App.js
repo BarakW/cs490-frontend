@@ -1,24 +1,35 @@
 import React, { Component } from 'react';
-import 'css/App.css';
+import { LandingView } from "./components/LandingView";
+import { UserView } from "./components/UserView";
+import { Grommet } from "grommet";
+import "./css/App.css";
 
 class App extends Component {
+  // What state should we save?
+  constructor(props) {
+    super(props);
+    this.state = {
+      user: null,
+    };
+  }
+
+  changeUser(newUser) {
+    this.setState({user: newUser});
+  }
+
+  getView() {
+    if (this.state.user) {
+      return <UserView/>;
+    } else {
+      return <LandingView loginHandler={this.changeUser}/>
+    }
+  }
+  
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
+      <Grommet className="App">
+      {this.getView()}
+      </Grommet>
     );
   }
 }
