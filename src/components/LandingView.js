@@ -13,7 +13,8 @@ export class LandingView extends Component {
 
     render() {
         return (
-            <Box height="100vh" background="url(./img/hero.jpg)">
+            <Box height="100%" background="url(./img/hero.jpg)">
+                Yoy
                 <Heading alignSelf="center">Movienite</Heading>
             </Box>
         )
