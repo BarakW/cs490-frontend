@@ -2,51 +2,72 @@ import React, { Component } from 'react';
 import { LandingView } from "./components/LandingView";
 import { UserView } from "./components/UserView";
 import { Grommet } from "grommet";
-import { generate } from "grommet/themes/base";
-import { deepMerge } from "grommet/utils";
-import { dark } from "grommet/themes";
+import firebase from "firebase";
 import "./css/App.css";
 
-const myThemeMods = {
+const firebaseConfig = {
+  apiKey: "AIzaSyBMaFHkNKEe6IgzvVHM-aZahW0_9iD7-FM",
+  authDomain: "movie-night-232923.firebaseapp.com",
+  databaseURL: "https://movie-night-232923.firebaseio.com",
+  projectId: "movie-night-232923",
+  storageBucket: "movie-night-232923.appspot.com",
+  messagingSenderId: "1066424388142"
+};
+const firebaseApp = firebase.initializeApp(firebaseConfig);
+
+const myTheme = {
   global: {
     font: {
       family: "Catamaran"
     },
     colors: {
+      background: "#333333",
       text: {
         dark: "#F3F3F3"
       }
     }
+  },
+  paragraph: {
+    medium: {
+      maxWidth: "100%"
+    }
+  },
+  button: {
+    color: "#F3F3F3"
   }
 };
-
-const theme = deepMerge(generate(24), myThemeMods);
 
 class App extends Component {
   // What state should we save?
   constructor(props) {
     super(props);
     this.state = {
-      user: null,
+      user: void(0),
     };
-  }
-
-  changeUser(newUser) {
-    this.setState({user: newUser});
   }
 
   getView() {
     if (this.state.user) {
-      return <UserView/>;
-    } else {
-      return <LandingView loginHandler={this.changeUser}/>
+      return <UserView firebaseApp={firebaseApp} />;
+    } else if (this.state.user === null) {
+      return <LandingView firebaseApp={firebaseApp} loginHandler={this.changeUser} />
     }
   }
-  
+
+  componentDidMount() {
+    this.unregisterAuthObserver = firebaseApp.auth().onAuthStateChanged((user) => {
+      this.setState({user: user});
+    });
+  }
+
+  componentWillUnmount() {
+    this.unregisterAuthObserver();
+  }
+
   render() {
     return (
-      <Grommet theme={theme} full>
-      {this.getView()}
+      <Grommet theme={myTheme} full>
+        {this.getView()}
       </Grommet>
     );
   }
