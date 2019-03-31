@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "firebase": "^5.9.2",
+    "fuse.js": "^3.4.4",
     "grommet": "^2.6.5",
     "grommet-icons": "^4.2.0",
     "react": "^16.8.6",
