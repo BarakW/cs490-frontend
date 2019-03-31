@@ -48,15 +48,18 @@ class App extends Component {
 
   getView() {
     if (this.state.user) {
-      return <UserView firebaseApp={firebaseApp} />;
+      return <UserView user={this.state.user} firebaseApp={firebaseApp}/>;
     } else if (this.state.user === null) {
-      return <LandingView firebaseApp={firebaseApp} loginHandler={this.changeUser} />
+      return <LandingView firebaseApp={firebaseApp}/>
     }
   }
 
   componentDidMount() {
     this.unregisterAuthObserver = firebaseApp.auth().onAuthStateChanged((user) => {
       this.setState({user: user});
+      if (user) {
+        console.log(user.displayName);
+      }
     });
   }
 

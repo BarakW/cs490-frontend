@@ -13,9 +13,11 @@ export class LandingView extends Component {
         };
 
         this.uiConfig = {
+            signInFlow: 'popup',
             signInOptions: [
                 firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-                firebase.auth.EmailAuthProvider.PROVIDER_ID 
+                // TODO: Add support for email authentication
+                //firebase.auth.EmailAuthProvider.PROVIDER_ID 
             ],
             callbacks: {
                 // Avoid redirects after sign-in.
