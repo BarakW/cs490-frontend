@@ -1,50 +1,49 @@
 import React, { Component } from "react";
 import {Box, Text, TextInput} from "grommet";
-import Fuse from "fuse.js";
-
-const options = {
-    shouldSort: true,
-    threshold: 0.2,
-    location: 0,
-    distance: 10,
-    maxPatternLength: 32,
-    minMatchCharLength: 1,
-    keys: ["name"]
-};
+import { searcher } from "../utils/fuzzy-search.js";
 
 export class SearchBox extends Component {
     constructor(props) {
         super(props);
-        this.searcher = new Fuse(this.props.movieMap, {
-            shouldSort: true,
-            threshold: 0.2,
-            location: 0,
-            distance: 10,
-            maxPatternLength: 32,
-            minMatchCharLength: 1,
-            keys: ["name"]
-        });
+        this.searcher = searcher("name", props.movieMap);
+        this.searchTimer = null;
         this.state = {
-            text: ""
+            text: "",
+            suggestions: []
         };
     }
 
+    componentDidUpdate(prevProps) {
+        if (!prevProps.movieMap.length) {
+            this.searcher = searcher("name", this.props.movieMap);
+        }
+    }
+
     makeMoviesList(text) {
+        if (!text) {
+            this.setState({suggestions: []});
+            return;
+        }
+
         const results = this.searcher.search(text);
-        const displayedResults = results.slice(0, 10);
-        console.log(displayedResults);
-        const suggestions = displayedResults.map((result) => {
+        const displayedResults = results.slice(0, 5);
+        const suggestions = displayedResults.map((result, index) => {
             return (
-            <Box>
-                <Text>{result}</Text>
+            <Box key={index}>
+                <Text>{result.name}</Text>
             </Box>
             );
         });
-        return suggestions;
+        this.setState({suggestions: suggestions});
     }
 
     onChangeHandler(event) {
-        this.setState({text: event.target.value});
+        const newText = event.target.value;
+        this.setState({text: newText});
+
+        // Only execute search if the user hasn't typed in 1s
+        clearTimeout(this.searchTimer);
+        this.searchTimer = setTimeout(() => this.makeMoviesList(newText), 500);
     }
 
     render() {
@@ -53,7 +52,7 @@ export class SearchBox extends Component {
                 <TextInput placeholder="search for a movie"
                             value={this.state.text}
                             onChange={e => this.onChangeHandler(e)}/>
-                {this.makeMoviesList(this.state.text)}
+                {this.state.suggestions}
             </Box>
         );
     }
