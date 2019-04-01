@@ -26,7 +26,7 @@ export class SearchBox extends Component {
         }
 
         const results = this.searcher.search(text);
-        const displayedResults = results.slice(0, 5);
+        const displayedResults = results.slice(0, 10);
         const suggestions = displayedResults.map((result, index) => {
             return (
             <Box key={index}>
@@ -43,7 +43,7 @@ export class SearchBox extends Component {
 
         // Only execute search if the user hasn't typed in 1s
         clearTimeout(this.searchTimer);
-        this.searchTimer = setTimeout(() => this.makeMoviesList(newText), 500);
+        this.searchTimer = setTimeout(() => this.makeMoviesList(newText), 200);
     }
 
     render() {
