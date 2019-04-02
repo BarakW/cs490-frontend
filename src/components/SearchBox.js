@@ -46,6 +46,10 @@ export class SearchBox extends Component {
         this.searchTimer = setTimeout(() => this.makeMoviesList(newText), 200);
     }
 
+    componentWillUnmount() {
+        clearTimeout(this.searchTimer);
+    }
+
     render() {
         return (
             <Box>

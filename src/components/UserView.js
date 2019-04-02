@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import { Box, Button, Heading } from "grommet";
 import { SearchBox } from "./SearchBox.js";
+import MovieCard from "./MovieCard.js"
 import firebase from "firebase";
 
-export class UserView extends Component {
+export class UserView extends Component { 
     constructor(props) {
         super(props);
         this.db = this.props.firebaseApp.firestore();
@@ -45,6 +46,7 @@ export class UserView extends Component {
             <Box>
                 <Heading>Hello {this.user.displayName}</Heading>
                 <SearchBox movieMap={this.state.movieMap}/>
+                <MovieCard showScore={true} name={"Shazam"} date={"4/5/19"} score={"93%"} posterUrl={"https://resizing.flixster.com/lHdwiaC3RebWF4bzvLwLmlfMSbc=/fit-in/200x296.2962962962963/v1.bTsxMzAxODU5MTtqOzE4MDYwOzEyMDA7Mjc2NDs0MDk2"} scoreType={"Prediction"} />
                 <Button color="accent-4" margin="xsmall" label="Log out" onClick={() => firebase.auth().signOut()}/>
             </Box>
         )
