@@ -25,7 +25,7 @@ export const getUser = (userId, db, callback) => {
     const userRef = db.collection("users").doc(userId);
     userRef.get().then(doc => {
         if (doc.exists) {
-            callback(doc.data);
+            callback(doc.data());
         } else {
             console.log("User: ", userId, " doesn't exist");
         }
