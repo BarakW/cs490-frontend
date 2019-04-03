@@ -4,7 +4,8 @@ const searchHelper = (key, list, string) => {
     const outputList = [];
     for (const item of list) {
         const comparison = Object.assign({}, item, {
-            distance: levenshtein(string, item[key].substr(0, string.length))
+            distance: levenshtein(string.toLowerCase(),
+                item[key].substr(0, string.length).toLowerCase())
         });
         outputList.push(comparison);
     }

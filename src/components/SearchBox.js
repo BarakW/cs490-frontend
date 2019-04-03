@@ -40,6 +40,10 @@ export class SearchBox extends Component {
         this.searchTimer = setTimeout(() => this.makeMoviesList(newText), 500);
     }
 
+    componentWillUnmount() {
+        clearTimeout(this.searchTimer);
+    }
+
     render() {
         if (!this.searcher.list.length) {
             this.searcher = searcher("name", this.props.movieMap); // Update the searching object with the new movieMap

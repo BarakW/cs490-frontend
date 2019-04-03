@@ -57,7 +57,7 @@ class App extends Component {
   }
 
   componentDidMount() {
-    // Change user when logged in
+    // save listener unsubscriber so we can unsubscribe in componentWillUnmount
     this.unregisterAuthObserver = firebaseApp.auth().onAuthStateChanged((user) => {
       this.setState({user: user});
     });
