@@ -5,18 +5,12 @@ import { searcher } from "../utils/fuzzy-search.js";
 export class SearchBox extends Component {
     constructor(props) {
         super(props);
-        this.searcher = searcher("name", props.movieMap);
-        this.searchTimer = null;
+        this.searcher = searcher("name", props.movieMap); // Object which handles generating suggestions
+        this.searchTimer = null; // Keep track of how long it's been since a user has typed into the search box
         this.state = {
-            text: "",
-            suggestions: []
+            text: "", // Text in the search field
+            suggestions: [] // Suggested autocomplete items
         };
-    }
-
-    componentDidUpdate(prevProps) {
-        if (!prevProps.movieMap.length) {
-            this.searcher = searcher("name", this.props.movieMap);
-        }
     }
 
     makeMoviesList(text) {
@@ -26,11 +20,11 @@ export class SearchBox extends Component {
         }
 
         const results = this.searcher.search(text);
-        const displayedResults = results.slice(0, 10);
+        const displayedResults = results.slice(0, 6);
         const suggestions = displayedResults.map((result, index) => {
             return (
-            <Box key={index}>
-                <Text>{result.name}</Text>
+            <Box key={result.id}>
+                <Text>{result.name}, distance: {result.distance}</Text>
             </Box>
             );
         });
@@ -43,10 +37,14 @@ export class SearchBox extends Component {
 
         // Only execute search if the user hasn't typed in 1s
         clearTimeout(this.searchTimer);
-        this.searchTimer = setTimeout(() => this.makeMoviesList(newText), 200);
+        this.searchTimer = setTimeout(() => this.makeMoviesList(newText), 500);
     }
 
     render() {
+        if (!this.searcher.list.length) {
+            this.searcher = searcher("name", this.props.movieMap); // Update the searching object with the new movieMap
+        }
+
         return (
             <Box>
                 <TextInput placeholder="search for a movie"

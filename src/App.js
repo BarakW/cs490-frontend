@@ -15,6 +15,7 @@ const firebaseConfig = {
 };
 const firebaseApp = firebase.initializeApp(firebaseConfig);
 
+// Grommet theme object, merges with default theme
 const myTheme = {
   global: {
     font: {
@@ -46,6 +47,7 @@ class App extends Component {
     };
   }
 
+  // Selects the landing page for being logged in or logged out
   getView() {
     if (this.state.user) {
       return <UserView user={this.state.user} firebaseApp={firebaseApp}/>;
@@ -55,12 +57,14 @@ class App extends Component {
   }
 
   componentDidMount() {
+    // Change user when logged in
     this.unregisterAuthObserver = firebaseApp.auth().onAuthStateChanged((user) => {
       this.setState({user: user});
     });
   }
 
   componentWillUnmount() {
+    // Stop listening to authentication changes
     this.unregisterAuthObserver();
   }
 
