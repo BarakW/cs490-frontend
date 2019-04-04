@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
 import { Box, Image, Text, ThemeContext } from "grommet";
+import { convertNumToColor } from "../utils/color-gradient.js"
 
 export const MovieCard = (props) => {
     let scoreText = null;
+    const color = convertNumToColor(props.score, 50);
     if (props.showScore) {
-        scoreText = <Text>{props.scoreType + ": "}<span style={{color: "#bb0000"}}>{props.score}</span></Text>
+        scoreText = <Text>{props.scoreType + ": "}<span style={{color: color}}>{props.score}</span></Text>
     }
 
     // TODO: convert movie times from unix time
@@ -16,10 +18,10 @@ export const MovieCard = (props) => {
         >
             <Box width="150px" 
              height="220px" 
-             border={{ color: '#AA0000', size: 'small' }}
+             border={{ color: color, size: 'small' }}
              round="small"
              margin="xsmall"
-             flex="grow"
+             flex="false" // <-- this may not be working as intended. test this later
             >
                 <Image fit="contain" src={props.posterUrl} />
                 <Text>{props.name}</Text>

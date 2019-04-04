@@ -40,7 +40,7 @@ export class RecommendationsView extends Component {
         }
     }
 
-    // create recommendations object we can use to display movie cards
+    // create recommendations object we can use to build up movie cards
     getRecsFromUser() {
         let recs = {
             newRecommendations: {},
