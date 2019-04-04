@@ -8,7 +8,7 @@ export const convertNumToColor = (num, minNum = 0) => {
     const slope = 100/(100 - minNum);
     const scale = (slope * (num - minNum)) / 100;
 
-    if (num < minNum) return "hsl("+color1.hue+","+color1.saturation+","+color1.lightness+")";
+    if (num < minNum) return "hsl("+color1.hue+","+color1.saturation+"%,"+color1.lightness+"%)";
     const h = color1.hue + scale * (color2.hue - color1.hue);
     const s = color1.saturation + scale * (color2.saturation - color1.saturation);
     const l = color1.lightness + scale * (color2.lightness - color1.lightness);
