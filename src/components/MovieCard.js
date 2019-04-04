@@ -21,7 +21,7 @@ export const MovieCard = (props) => {
              border={{ color: color, size: 'small' }}
              round="small"
              margin="xsmall"
-             flex="false" // <-- this may not be working as intended. test this later
+             flex={false} // <-- this may not be working as intended. test this later
             >
                 <Image fit="contain" src={props.posterUrl} />
                 <Text>{props.name}</Text>
