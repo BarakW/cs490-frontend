@@ -1,7 +1,7 @@
 import React, { Component } from "react";
-import { getUser, getMovieDoc, getPoster } from "../utils/db-functions.js"
-import {Box, Heading, Text, TextInput} from "grommet";
-import { MovieCarousel } from "./MovieCarousel";;
+import { getMovieDoc, getPoster } from "../utils/db-functions.js"
+import { Box, Heading } from "grommet";
+import { MovieCarousel } from "./MovieCarousel";
 
 const shazam = {
     name: "Shazam",
@@ -21,7 +21,7 @@ export class RecommendationsView extends Component {
         super(props);
         this.user = this.props.user;
         this.db = this.props.db;
-        this.storage = this.props.storage;
+        this.storageRef = this.props.storageRef;
         this.recommendationsObj = null;
         this.state = {
             newMovies: [],
@@ -29,20 +29,18 @@ export class RecommendationsView extends Component {
         };
         
         this.buildMoviesList = this.buildMoviesList.bind(this);
-        this.getStorage = this.getStorage.bind(this);
-    }
-
-    getStorage() {
-        return this.storage;
+        this.addMovieMetadata = this.addMovieMetadata.bind(this);
     }
 
     componentDidUpdate(prevProps, prevState) {
+        // make sure we don't create the recommendationsObj until we have the users info
         if (this.props.userDoc && !this.recommendationsObj) {
             this.recommendationsObj = this.getRecsFromUser();
+            this.getMoviesForUser(this.recommendationsObj);
         }
     }
 
-//name, date, posterURL, score
+    // create recommendations object we can use to display movie cards
     getRecsFromUser() {
         let recs = {
             newRecommendations: {},
@@ -63,77 +61,71 @@ export class RecommendationsView extends Component {
         return recs;
     }
 
+    // get info about each movie we want to recommend to the user
     getMoviesForUser (recsObj) {
         for (let movieId in recsObj.newRecommendations) {
             getMovieDoc(
                 movieId,
                 this.db,
-                this.updateMovieObj,
-                recsObj
-            )  
+                this.addMovieMetadata,
+                {
+                    movieObj: recsObj.newRecommendations[movieId],
+                    isNewMovie: true
+                }
+            );  
         }
         for (let movieId in recsObj.allRecommendations) {
             getMovieDoc(
                 movieId,
                 this.db,
-                this.updateMovieObj,
-                recsObj
-            )  
+                this.addMovieMetadata,
+                {
+                    movieObj: recsObj.allRecommendations[movieId],
+                    isNewMovie: false
+                }
+            ); 
         }
-        console.log("Finished get movies");
-        
+        // console.log("Finished get movies");
     }
 
-    updateMovieObj (movieDoc, recsObj) {
-        // name, date
-        console.log("UMO recObj: ", recsObj);
+    // add name and date to this movie. get the img src of the movie poster
+    addMovieMetadata (movieDoc, args) {
+        const {movieObj, isNewMovie} = args;
+        // get movieDoc from database function return
+        movieDoc = movieDoc.data();
+
+        movieObj.name = movieDoc.name;
+        movieObj.date = movieDoc.date;
         
-        let movieId = movieDoc.id;
-        let doc = movieDoc.data();
-        if (recsObj.newRecommendations[movieId]) {
-            recsObj.newRecommendations[movieId].name = doc.name;
-            recsObj.newRecommendations[movieId].date = doc.date;
-        } else {
-            recsObj.allRecommendations[movieId].name = doc.name;
-            recsObj.allRecommendations[movieId].date = doc.date;
-        }
-        console.log("Crashed after getPoster?");
-        getPoster(movieDoc.posterFile, this.getStorage(), this.buildMoviesList, {recsObj, movieId});
-        console.log("UMO recObj after: ", recsObj);
-        console.log("Finished updateMovieObj");
+        getPoster(movieDoc.posterFile, this.storageRef, this.buildMoviesList, {movieObj, isNewMovie});
     }
 
+    // add this movie to the state
     buildMoviesList (posterURL, args) {
-        const {recsObj, movieId} = args;
-        
-        if (recsObj.newRecommendations[movieId]) {
-            recsObj.newRecommendations[movieId].posterURL = posterURL;
-        } else {
-            recsObj.allRecommendations[movieId].posterURL = posterURL;
-        }
-        
-        const newMovies = []
-        for (let movieObj in recsObj.newRecommendations) {
+        const {movieObj, isNewMovie} = args;
+        movieObj.posterURL = posterURL;
+
+        // check if movie is new so we can add it to the correct list
+        if (isNewMovie) {
+            let newMovies = this.state.newMovies;
             newMovies.push(movieObj);
-        }
-        const allMovies = []
-        for (let movieObj in recsObj.allRecommendations) {
+            this.setState({newMovies});
+        } else {
+            let allMovies = this.allMovies;
             allMovies.push(movieObj);
+            this.setState({allMovies});
         }
-        this.setState({newMovies, allMovies});
+
+        // console.log(newMovies)
     }
 
     render () {
-        if (this.props.userDoc && this.recommendationsObj) {
-            this.getMoviesForUser(this.recommendationsObj);
-        }
-
         return (
-        <Box>
-            <Heading>New Movies</Heading>
-            <MovieCarousel scoreType="Recommendation" showScore={true} movies={this.state.newMovies}/>
-            <Heading>All Movies</Heading>
-        </Box>
+            <Box>
+                <Heading>New Movies</Heading>
+                <MovieCarousel scoreType="Prediction" showScore={true} movies={this.state.newMovies}/>
+                <Heading>All Movies</Heading>
+            </Box>
         );
     }
 }

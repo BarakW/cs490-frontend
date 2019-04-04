@@ -9,7 +9,7 @@ export class UserView extends Component {
     constructor(props) {
         super(props);
         this.db = this.props.firebaseApp.firestore(); // Firestore (documents)
-        this.storage = this.props.firebaseApp.storage(); // Blob storage (files)
+        this.storageRef = this.props.firebaseApp.storage().ref(); // Blob storage (files)
         this.userToken = this.props.userToken;
         this.userRef = this.db.collection("users").doc(this.userToken.uid);
         this.state = {
@@ -21,7 +21,7 @@ export class UserView extends Component {
 
     // Pull the movies map asynchronously from storage
     getMovieMap() {
-        const movieMapRef = this.storage.ref().child('app-data/movies_map.json')
+        const movieMapRef = this.storageRef.child('app-data/movies_map.json')
         movieMapRef.getDownloadURL().then((url) => {
             fetch(url).then((response) => {
                 return response.json();
@@ -50,8 +50,8 @@ export class UserView extends Component {
         return (
             <Box>
                 <Heading>Hello {this.userToken.displayName}</Heading>
-                <RecommendationsView userDoc={this.state.userDoc} db={this.db} storage={this.storage}/>
-                {/* <NewRatingsView firebaseDB={this.db} fbStorage={this.storage} movieMap={this.state.movieMap} /> */}
+                <RecommendationsView userDoc={this.state.userDoc} db={this.db} storageRef={this.storageRef}/>
+                {/* <NewRatingsView firebaseDB={this.db} fbStorage={this.storageRef} movieMap={this.state.movieMap} /> */}
                 <Button color="accent-4" margin="xsmall" label="Log out" onClick={() => firebase.auth().signOut()}/>
             </Box>
         )

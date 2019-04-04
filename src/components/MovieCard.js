@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Box, Image, Text, ThemeContext } from "grommet";
 
-const MovieCard = (props) => {
+export const MovieCard = (props) => {
     let scoreText = null;
     if (props.showScore) {
         scoreText = <Text>{props.scoreType + ": "}<span style={{color: "#bb0000"}}>{props.score}</span></Text>
@@ -29,5 +29,3 @@ const MovieCard = (props) => {
         </ThemeContext.Extend>
     )
 }
-
-export default MovieCard;
