@@ -5,7 +5,7 @@ export const convertNumToColor = (num, minNum = 0) => {
     const color2 = {red: 0, green: 150, blue: 0};
     const percent = num / 100;
 
-    if (num < minNum) return color1;
+    if (num < minNum) return "rgb("+color1.red+","+color1.green+","+color1.blue+")";
     const r = color1.red + percent * (color2.red - color1.red);
     const g = color1.green + percent * (color2.green - color1.green);
     const b = color1.blue + percent * (color2.blue - color1.blue);
