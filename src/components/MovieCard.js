@@ -4,7 +4,7 @@ import { convertNumToColor } from "../utils/color-gradient.js"
 
 export const MovieCard = (props) => {
     let scoreText = null;
-    const color = convertNumToColor(props.score, 50);
+    const color = convertNumToColor(props.score, 40);
     if (props.showScore) {
         scoreText = <Text>{props.scoreType + ": "}<span style={{color: color}}>{props.score}</span></Text>
     }

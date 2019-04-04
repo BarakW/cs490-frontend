@@ -15,7 +15,7 @@ export const MovieCarousel = (props) => {
     });
 
     return (
-        <Box overflow="scroll" direction="row-responsive">
+        <Box overflow="scroll" direction="row">
             {movieCards}
         </Box>
     );
