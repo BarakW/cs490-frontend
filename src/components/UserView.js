@@ -10,10 +10,11 @@ export class UserView extends Component {
         super(props);
         this.db = this.props.firebaseApp.firestore(); // Firestore (documents)
         this.storage = this.props.firebaseApp.storage(); // Blob storage (files)
-        this.user = this.props.user; // User token (not user document, change this?)
-        this.userRef = this.db.collection("users").doc(this.user.uid);
+        this.userToken = this.props.userToken;
+        this.userRef = this.db.collection("users").doc(this.userToken.uid);
         this.state = {
             movieMap: [], // List of movies containing movie name and movie id
+            userDoc: null // Data from the user document
         }
         this.getMovieMap();
     }
@@ -37,18 +38,19 @@ export class UserView extends Component {
         this.userRef.get().then((doc) => {
             if (!doc.exists) {
                 this.userRef.set({
-                    email: this.user.email,
-                    displayName: this.user.displayName
+                    email: this.userToken.email,
+                    displayName: this.userToken.displayName
                 })
             }
+            this.setState({userDoc: doc.data()});
         });
     }
 
     render() {
         return (
             <Box>
-                <Heading>Hello {this.user.displayName}</Heading>
-                <RecommendationsView/>
+                <Heading>Hello {this.userToken.displayName}</Heading>
+                <RecommendationsView userDoc={this.state.userDoc} db={this.db} storage={this.storage}/>
                 {/* <NewRatingsView firebaseDB={this.db} fbStorage={this.storage} movieMap={this.state.movieMap} /> */}
                 <Button color="accent-4" margin="xsmall" label="Log out" onClick={() => firebase.auth().signOut()}/>
             </Box>

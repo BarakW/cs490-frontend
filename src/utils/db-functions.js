@@ -2,9 +2,12 @@ import firebase from "firebase";
 
 // Retrieves poster file from storage
 export const getPoster = (posterId, storageRef, callback, cbArgs) => {
+    console.log("hello");
     const posterRef = storageRef.child("app-data/posters/" + posterId + ".jpg");
     posterRef.getDownloadURL().then(url => {
+        console.log("Callback sad?");
         callback(url, cbArgs);
+        console.log("Callback happy ^_^");
     }).catch(console.error);
 };
 

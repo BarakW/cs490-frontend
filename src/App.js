@@ -43,23 +43,23 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      user: void(0),
+      userToken: void(0),
     };
   }
 
   // Selects the landing page for being logged in or logged out
   getView() {
-    if (this.state.user) {
-      return <UserView user={this.state.user} firebaseApp={firebaseApp}/>;
-    } else if (this.state.user === null) {
+    if (this.state.userToken) {
+      return <UserView userToken={this.state.userToken} firebaseApp={firebaseApp}/>;
+    } else if (this.state.userToken === null) {
       return <LandingView firebaseApp={firebaseApp}/>
     }
   }
 
   componentDidMount() {
     // save listener unsubscriber so we can unsubscribe in componentWillUnmount
-    this.unregisterAuthObserver = firebaseApp.auth().onAuthStateChanged((user) => {
-      this.setState({user: user});
+    this.unregisterAuthObserver = firebaseApp.auth().onAuthStateChanged((userToken) => {
+      this.setState({userToken: userToken});
     });
   }
 
