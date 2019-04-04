@@ -22,9 +22,9 @@ const myTheme = {
       family: "Catamaran"
     },
     colors: {
-      background: "#333333",
+      background: "#111111",
       text: {
-        dark: "#F3F3F3"
+        dark: "#CCCCCC"
       }
     }
   },
