@@ -6,7 +6,7 @@ export const MovieCard = (props) => {
     let scoreText = null;
     const color = convertNumToColor(props.score, 40);
     if (props.showScore) {
-        scoreText = <Text>{props.scoreType + ": "}<span style={{color: color}}>{props.score}</span></Text>
+        scoreText = <Text className="text-on-image">{props.scoreType + ": "}<span style={{color: color}}>{props.score}</span></Text>
     }
 
     // TODO: convert movie times from unix time
@@ -16,17 +16,19 @@ export const MovieCard = (props) => {
                 
             }}
         >
-            <Box width="150px" 
+            <Box
+             width="150px" 
              height="220px" 
              border={{ color: color, size: 'small' }}
              round="small"
              margin="xsmall"
              flex={false} // <-- this may not be working as intended. test this later
+             background={{image: "url(" + props.posterUrl + ")"}}
+             direction="column-reverse"
             >
-                <Image fit="contain" src={props.posterUrl} />
-                <Text>{props.name}</Text>
-                <Text>{props.date}</Text>
-                {scoreText}
+                {/* {scoreText}
+                <Text className="text-on-image">{props.date}</Text>
+                <Text className="text-on-image">{props.name}</Text> */}
             </Box>
         </ThemeContext.Extend>
     )
