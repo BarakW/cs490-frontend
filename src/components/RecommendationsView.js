@@ -111,7 +111,7 @@ export class RecommendationsView extends Component {
             newMovies.push(movieObj);
             this.setState({newMovies});
         } else {
-            let allMovies = this.allMovies;
+            let allMovies = this.state.allMovies;
             allMovies.push(movieObj);
             this.setState({allMovies});
         }
@@ -125,6 +125,7 @@ export class RecommendationsView extends Component {
                 <Heading>New Movies</Heading>
                 <MovieCarousel scoreType="Prediction" showScore={true} movies={this.state.newMovies}/>
                 <Heading>All Movies</Heading>
+                <MovieCarousel scoreType="Prediction" showScore={true} movies={this.state.allMovies}/>
             </Box>
         );
     }
