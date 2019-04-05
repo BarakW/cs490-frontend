@@ -3,7 +3,10 @@ import { Box } from "grommet";
 import { MovieCard } from "./MovieCard.js";
 
 export const MovieCarousel = (props) => {
-    const movieCards = props.movies.map((movie) => {
+    const movies = props.movies.slice();
+    movies.sort((a, b) => a.score < b.score); // Sort movies from high to low
+
+    const movieCards = movies.map((movie) => {
         return <MovieCard name={movie.name}
                           date={movie.date}
                           showScore={props.showScore}
