@@ -33,7 +33,7 @@ export class EditRating extends Component {
             >
                 <Text>{this.props.name}</Text>
                 <Text>{this.props.date}</Text>
-                <Text>{"Current Rating: "}<span style={{color: this.state.color}}>{this.props.score}</span></Text>
+                <Text>{this.props.scoreType + ": "}<span style={{color: this.state.color}}>{this.props.score}</span></Text>
                 <RadioButtonGroup
                     name="doc"
                     options={['shit', 'good']}

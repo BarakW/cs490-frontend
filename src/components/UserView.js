@@ -37,11 +37,12 @@ export class UserView extends Component {
         });
     }
 
-    showEditRatingOnClick = (name, date, score, movieId) => {
+    showEditRatingOnClick = (name, date, score, movieId, scoreType) => {
         this.editRatingModal = <EditRating
                                     name={name}
                                     date={date}
                                     score={score}
+                                    scoreType={scoreType}
                                     userId={this.userToken.uid}
                                     movieId={movieId}
                                     db={this.db}
