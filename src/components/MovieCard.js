@@ -22,9 +22,11 @@ export const MovieCard = (props) => {
              border={{ color: color, size: 'small' }}
              round="small"
              margin="xsmall"
-             flex={false} // <-- this may not be working as intended. test this later
+             flex={false}
              background={{image: "url(" + props.posterUrl + ")"}}
              direction="column-reverse"
+             onClick={() => props.handleClick(props.name, props.date, props.score, props.id)}
+            // onClick={() => console.log('clicked!')}
             >
                 {/* {scoreText}
                 <Text className="text-on-image">{props.date}</Text>

@@ -29,7 +29,7 @@ export const getUser = (userId, db, callback, cbArgs) => {
         } else {
             console.log("User: ", userId, " doesn't exist");
         }
-    }).catch(console.log);
+    }).catch(console.error);
 };
 
 // Add a user rating
@@ -37,7 +37,7 @@ export const addRating = (userId, movieId, score, db) => {
     const batch = db.batch();
     const userRef = db.collection("users").doc(userId);
     const ratingLoc = "ratings." + movieId;
-    batch.update(userRef, {ratingLoc: score});
+    batch.update(userRef, {[ratingLoc]: score});
     batch.update(userRef, {stale: true});
     batch.commit();
 };
@@ -47,7 +47,7 @@ export const removeRating = (userId, movieId, db) => {
     const batch = db.batch();
     const userRef = db.collection("users").doc(userId);
     const ratingLoc = "ratings." + movieId;
-    batch.update(userRef, {ratingLoc: firebase.firestore.FieldValue.delete()});
+    batch.update(userRef, {[ratingLoc]: firebase.firestore.FieldValue.delete()});
     batch.update(userRef, {stale: true});
     batch.commit();
 }
@@ -56,5 +56,5 @@ export const removeRating = (userId, movieId, db) => {
 export const addUserListener = (userId, db, callback, cbArgs) => {
     return db.collection("users").doc(userId).onSnapshot((doc) => {
         callback(doc, cbArgs);
-    });
+    }, (err) => console.error(err));
 };

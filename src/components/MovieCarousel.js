@@ -4,17 +4,22 @@ import { MovieCard } from "./MovieCard.js";
 
 export const MovieCarousel = (props) => {
     const movies = props.movies.slice();
-    movies.sort((a, b) => a.score < b.score); // Sort movies from high to low
+    movies.sort((a, b) => b.score - a.score); // Sort movies from high to low
 
     const movieCards = movies.map((movie) => {
-        return <MovieCard name={movie.name}
-                          date={movie.date}
-                          showScore={props.showScore}
-                          scoreType={props.scoreType}
-                          score={movie.score}
-                          posterUrl={movie.posterURL}
-                          key={movie.id}
-                          />;
+        return (
+            <MovieCard 
+                name={movie.name}
+                date={movie.date}
+                showScore={props.showScore}
+                scoreType={props.scoreType}
+                score={movie.score}
+                posterUrl={movie.posterURL}
+                key={movie.id}
+                id={movie.id}
+                handleClick={props.handleClick}
+            />
+        );
     });
 
     return (

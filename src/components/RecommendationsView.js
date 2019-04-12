@@ -19,7 +19,6 @@ for (let i = 0; i < 20; i++) {
 export class RecommendationsView extends Component {
     constructor (props) {
         super(props);
-        this.user = this.props.user;
         this.db = this.props.db;
         this.storageRef = this.props.storageRef;
         this.recommendationsObj = null;
@@ -34,8 +33,11 @@ export class RecommendationsView extends Component {
 
     componentDidUpdate(prevProps, prevState) {
         // make sure we don't create the recommendationsObj until we have the users info
-        if (this.props.userDoc && !this.recommendationsObj) {
+        const userDocHasChanged = JSON.stringify(this.props.userDoc) !== JSON.stringify(prevProps.userDoc) 
+        if (this.props.userDoc && userDocHasChanged) {
             this.recommendationsObj = this.getRecsFromUser();
+            // TODO: only rerender the movie that has changed. this is going to rerender everything.
+            this.setState({newMovies: [], allMovies: []});
             this.getMoviesForUser(this.recommendationsObj);
         }
     }
@@ -58,6 +60,7 @@ export class RecommendationsView extends Component {
                 score: this.props.userDoc.allRecommendations[movieId]
             };
         }
+        console.log('Recs:', recs)
         return recs;
     }
 
@@ -91,7 +94,8 @@ export class RecommendationsView extends Component {
     // add name and date to this movie. get the img src of the movie poster
     addMovieMetadata (movieDoc, args) {
         const {movieObj, isNewMovie} = args;
-        // get movieDoc from database function return
+        // database function doesn't return the actual movieDoc object.
+        // need to call .data() to get the movieDoc
         movieDoc = movieDoc.data();
 
         movieObj.name = movieDoc.name;
@@ -107,12 +111,10 @@ export class RecommendationsView extends Component {
 
         // check if movie is new so we can add it to the correct list
         if (isNewMovie) {
-            let newMovies = this.state.newMovies;
-            newMovies.push(movieObj);
+            let newMovies = [...this.state.newMovies, movieObj];
             this.setState({newMovies});
         } else {
-            let allMovies = this.state.allMovies;
-            allMovies.push(movieObj);
+            let allMovies = [...this.state.allMovies, movieObj];
             this.setState({allMovies});
         }
 
@@ -123,9 +125,19 @@ export class RecommendationsView extends Component {
         return (
             <Box>
                 <Heading>New Movies</Heading>
-                <MovieCarousel scoreType="Prediction" showScore={true} movies={this.state.newMovies}/>
+                <MovieCarousel
+                    scoreType="Prediction"
+                    showScore={true}
+                    movies={this.state.newMovies}
+                    handleClick={this.props.handleClick}
+                />
                 <Heading>All Movies</Heading>
-                <MovieCarousel scoreType="Prediction" showScore={true} movies={this.state.allMovies}/>
+                <MovieCarousel
+                    scoreType="Prediction"
+                    showScore={true}
+                    movies={this.state.allMovies}
+                    handleClick={this.props.handleClick}
+                />
             </Box>
         );
     }
