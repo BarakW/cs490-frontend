@@ -37,6 +37,7 @@ export class SearchBox extends Component {
 
     showRateMovieModal = (movieDoc, args) => {
         const { id } = args;
+        movieDoc = movieDoc.data();
         this.props.handleClick(movieDoc.name, movieDoc.date, 'Not rated!', id, 'Current Rating');
     }
 
