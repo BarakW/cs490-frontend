@@ -39,14 +39,14 @@ export class UserView extends Component {
 
     showEditRatingOnClick = (name, date, score, movieId, scoreType) => {
         this.editRatingModal = <EditRating
-                                    name={name}
-                                    date={date}
-                                    score={score}
-                                    scoreType={scoreType}
-                                    userId={this.userToken.uid}
-                                    movieId={movieId}
-                                    db={this.db}
-                                />;
+            name={name}
+            date={date}
+            score={score}
+            scoreType={scoreType}
+            userId={this.userToken.uid}
+            movieId={movieId}
+            db={this.db}
+        />;
         this.setState({
             showEditRating: true
         });
@@ -54,14 +54,13 @@ export class UserView extends Component {
 
     updateUserDoc = (doc, args) => {
         // create a user document if it doesn't exist
-        console.log('document was updated!')
+        // console.log('document was updated!')
         if (!doc.exists) {
             this.userRef.set({
                 email: this.userToken.email,
                 displayName: this.userToken.displayName
             }, {merge: true}).catch(console.error);
         } else {
-            console.log(doc.data())
             this.setState({userDoc: doc.data()});
         }
     }
