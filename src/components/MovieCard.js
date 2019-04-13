@@ -26,7 +26,6 @@ export const MovieCard = (props) => {
              background={{image: "url(" + props.posterUrl + ")"}}
              direction="column-reverse"
              onClick={() => props.handleClick(props.name, props.date, props.score, props.id, props.scoreType)}
-            // onClick={() => console.log('clicked!')}
             >
                 {/* {scoreText}
                 <Text className="text-on-image">{props.date}</Text>

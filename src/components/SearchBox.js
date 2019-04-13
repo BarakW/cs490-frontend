@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import {Box, Text, TextInput} from "grommet";
 import { searcher } from "../utils/fuzzy-search.js";
+import { getMovieDoc } from "../utils/db-functions.js"
 
 export class SearchBox extends Component {
     constructor(props) {
@@ -23,12 +24,20 @@ export class SearchBox extends Component {
         const displayedResults = results.slice(0, 6);
         const suggestions = displayedResults.map((result, index) => {
             return (
-            <Box key={result.id}>
+            <Box
+                pad="xsmall"
+                key={result.id}
+                onClick={() => getMovieDoc(result.id, this.props.db, this.showRateMovieModal, {id: result.id})}>
                 <Text>{result.name}, distance: {result.distance}</Text>
             </Box>
             );
         });
         this.setState({suggestions: suggestions});
+    }
+
+    showRateMovieModal = (movieDoc, args) => {
+        const { id } = args;
+        this.props.handleClick(movieDoc.name, movieDoc.date, 'Not rated!', id, 'Current Rating');
     }
 
     onChangeHandler(event) {
@@ -51,7 +60,7 @@ export class SearchBox extends Component {
 
         return (
             <Box>
-                <TextInput placeholder="search for a movie"
+                <TextInput placeholder="search for a movie to rate..."
                             value={this.state.text}
                             onChange={e => this.onChangeHandler(e)}/>
                 {this.state.suggestions}

@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Box, Button, Heading, Layer } from "grommet";
 import { NewRatingsView } from "./NewRatingsView.js";
-import MovieCard from "./MovieCard.js"
 import firebase from "firebase";
 import { RecommendationsView } from './RecommendationsView.js';
 import { EditRating } from './EditRating.js'
@@ -53,7 +52,7 @@ export class UserView extends Component {
     }
 
     updateUserDoc = (doc, args) => {
-        // const { id, email, displayName } = args;
+        // create a user document if it doesn't exist
         console.log('document was updated!')
         if (!doc.exists) {
             this.userRef.set({
@@ -67,18 +66,8 @@ export class UserView extends Component {
     }
 
     componentDidMount() {
-
+        // listen to changes on user doc
         this.unregisterUserListener = addUserListener(this.userToken.uid, this.db, this.updateUserDoc, {})
-        // Create user document if it doesn't exist
-        // this.userRef.get().then((doc) => {
-        //     if (!doc.exists) {
-        //         this.userRef.set({
-        //             email: this.userToken.email,
-        //             displayName: this.userToken.displayName
-        //         })
-        //     }
-        //     this.setState({userDoc: doc.data()});
-        // });
     }
 
     componentWillUnmount () {
@@ -99,13 +88,19 @@ export class UserView extends Component {
                 </Layer>
                 }
                 <Heading>Hi, {this.userToken.displayName}</Heading>
-                <RecommendationsView
+                {/* <RecommendationsView
                     userDoc={this.state.userDoc}
                     db={this.db}
                     storageRef={this.storageRef}
                     handleClick={this.showEditRatingOnClick}
+                /> */}
+                <NewRatingsView 
+                    db={this.db}
+                    storageRef={this.storageRef}
+                    userDoc={this.state.userDoc}
+                    movieMap={this.state.movieMap}
+                    handleClick={this.showEditRatingOnClick}
                 />
-                {/* <NewRatingsView firebaseDB={this.db} fbStorage={this.storageRef} movieMap={this.state.movieMap} /> */}
                 <Button color="accent-4" margin="xsmall" label="Log out" onClick={() => firebase.auth().signOut()}/>
             </Box>
         )
