@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Box, Text, RadioButtonGroup, Button, Layer } from "grommet";
+import { Box, Text, RadioButtonGroup, Heading } from "grommet";
 import { addRating } from "../utils/db-functions.js"
 import { convertNumToColor } from "../utils/color-gradient.js"
 
@@ -8,35 +8,41 @@ export class EditRating extends Component {
         super(props);
 
         this.state = {
+            score: this.props.score,
             color: convertNumToColor(props.score, 40),
             selectedValue: null
         }
     }
 
     updateRating = (newRatingString) => {
-        const newRating = newRatingString === 'shit' ? 1 : 100;
+        const ratingsMap = {
+            'unwatchable': 1,
+            'bad': 25,
+            'meh': 50,
+            'good': 75,
+            'wow': 100
+        }
+        const newRating = ratingsMap[newRatingString];
         addRating(this.props.userId, this.props.movieId, newRating, this.props.db);
-        // .then((newRating, newRatingString) => {
-            this.setState({
-                // color: convertNumToColor(newRating, 40),
-                selectedValue: newRatingString
-            });
-        // });
+        this.setState({
+            score: newRating,
+            color: convertNumToColor(newRating, 40),
+            selectedValue: newRatingString
+        });
     }
 
     render () {
         return (
             <Box
-                // width="500px" 
-                // height="500px"
                 margin="small"
             >
-                <Text>{this.props.name}</Text>
+                <Heading level={2}>{this.props.name}</Heading>
                 <Text>{this.props.date}</Text>
-                <Text>{this.props.scoreType + ": "}<span style={{color: this.state.color}}>{this.props.score}</span></Text>
+                <Text>{this.props.scoreType + ": "}<span style={{color: this.state.color}}>{this.state.score}</span></Text>
+                <Text margin={{'top': 'small'}}>How was the movie?</Text>
                 <RadioButtonGroup
                     name="doc"
-                    options={['shit', 'good']}
+                    options={['unwatchable', 'bad', 'meh', 'good', 'wow']}
                     value={this.state.selectedValue}
                     onChange={(event) => this.updateRating(event.target.value)}
                 />
