@@ -17,7 +17,8 @@ export class UserView extends Component {
         this.state = {
             movieMap: [], // List of movies containing movie name and movie id
             userDoc: null, // Data from the user document
-            showEditRating: false
+            showEditRating: false,
+            showRatingsView: false
         }
         this.getMovieMap();
     }
@@ -76,6 +77,22 @@ export class UserView extends Component {
     }
 
     render() {
+        let view = <RecommendationsView
+            userDoc={this.state.userDoc}
+            db={this.db}
+            storageRef={this.storageRef}
+            handleClick={this.showEditRatingOnClick}
+        />;
+        if (this.state.showRatingsView) {
+            view = <NewRatingsView 
+                db={this.db}
+                storageRef={this.storageRef}
+                userDoc={this.state.userDoc}
+                movieMap={this.state.movieMap}
+                handleClick={this.showEditRatingOnClick}
+            />;
+        }
+
         return (
             <Box>
                 {this.state.showEditRating &&
@@ -88,19 +105,10 @@ export class UserView extends Component {
                 </Layer>
                 }
                 <Heading>Hi, {this.userToken.displayName}</Heading>
-                {/* <RecommendationsView
-                    userDoc={this.state.userDoc}
-                    db={this.db}
-                    storageRef={this.storageRef}
-                    handleClick={this.showEditRatingOnClick}
-                /> */}
-                <NewRatingsView 
-                    db={this.db}
-                    storageRef={this.storageRef}
-                    userDoc={this.state.userDoc}
-                    movieMap={this.state.movieMap}
-                    handleClick={this.showEditRatingOnClick}
-                />
+                {view}
+                <Button color="accent-1" margin="xsmall"
+                    label={this.state.showRatingsView ? 'View Recommendations' : 'Add Ratings'}
+                    onClick={() => this.setState({showRatingsView: !this.state.showRatingsView})}/>
                 <Button color="accent-4" margin="xsmall" label="Log out" onClick={() => firebase.auth().signOut()}/>
             </Box>
         )

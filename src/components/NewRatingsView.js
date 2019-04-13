@@ -29,6 +29,14 @@ export class NewRatingsView extends Component {
         }
     }
 
+    componentDidMount () {
+        // when doc is first mounted, fetch movies
+        if (this.props.userDoc) {
+            this.ratingsObj = this.getRatingsFromUser();
+            this.getMoviesForUser(this.ratingsObj);
+        }
+    }
+
     // create ratings object we can use to build up movie cards
     getRatingsFromUser() {
         let ratings = {}

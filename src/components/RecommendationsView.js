@@ -42,6 +42,13 @@ export class RecommendationsView extends Component {
         }
     }
 
+    componentDidMount () {
+        if (this.props.userDoc) {
+            this.recommendationsObj = this.getRecsFromUser();
+            this.getMoviesForUser(this.recommendationsObj);
+        }
+    }
+
     // create recommendations object we can use to build up movie cards
     getRecsFromUser() {
         let recs = {

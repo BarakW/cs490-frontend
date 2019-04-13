@@ -9,7 +9,6 @@ export class EditRating extends Component {
 
         this.state = {
             score: this.props.score,
-            color: convertNumToColor(props.score, 40),
             selectedValue: null
         }
     }
@@ -26,7 +25,6 @@ export class EditRating extends Component {
         addRating(this.props.userId, this.props.movieId, newRating, this.props.db);
         this.setState({
             score: newRating,
-            color: convertNumToColor(newRating, 40),
             selectedValue: newRatingString
         });
     }
@@ -38,7 +36,7 @@ export class EditRating extends Component {
             >
                 <Heading level={2}>{this.props.name}</Heading>
                 <Text>{this.props.date}</Text>
-                <Text>{this.props.scoreType + ": "}<span style={{color: this.state.color}}>{this.state.score}</span></Text>
+                <Text>{this.props.scoreType + ": "}<span style={{color: convertNumToColor(this.state.score)}}>{this.state.score}</span></Text>
                 <Text margin={{'top': 'small'}}>How was the movie?</Text>
                 <RadioButtonGroup
                     name="doc"
