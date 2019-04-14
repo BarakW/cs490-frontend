@@ -2,10 +2,15 @@ import firebase from "firebase";
 
 // Retrieves poster file from storage
 export const getPoster = (posterId, storageRef, callback, cbArgs) => {
-    const posterRef = storageRef.child("app-data/posters/" + posterId + ".jpg");
-    posterRef.getDownloadURL().then(url => {
-        callback(url, cbArgs);
-    }).catch(console.error);
+    if (posterId === undefined) {
+        console.error('poster not found')
+        callback('https://i.ytimg.com/vi/Kjq6i_vUK5Q/hqdefault.jpg', cbArgs);
+    } else {
+        const posterRef = storageRef.child("app-data/posters/" + posterId + ".jpg");
+        posterRef.getDownloadURL().then(url => {
+            callback(url, cbArgs);
+        }).catch(console.error);
+    }
 };
 
 // Retrieves all movie information
@@ -39,7 +44,7 @@ export const addRating = (userId, movieId, score, db) => {
     const ratingLoc = "ratings." + movieId;
     batch.update(userRef, {[ratingLoc]: score});
     batch.update(userRef, {stale: true});
-    batch.commit();
+    return batch.commit();
 };
 
 // Remove a user rating

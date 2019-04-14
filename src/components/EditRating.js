@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Box, Text, RadioButtonGroup, Heading } from "grommet";
+import { Box, Text, RadioButtonGroup, Heading, Layer } from "grommet";
 import { addRating } from "../utils/db-functions.js"
 import { convertNumToColor } from "../utils/color-gradient.js"
 
@@ -25,35 +25,50 @@ export class EditRating extends Component {
 
         this.state = {
             score: this.props.score,
-            scoreType: this.props.scoreType
+            scoreType: this.props.scoreType,
+            selectedRating: false
         }
     }
 
-    updateRating = (newRatingString) => {
+    updateRating = () => {
+        const movieWasUnrated = this.state.score && this.state.scoreType === 'Prediction';
+        const isNewRating = this.state.score !== this.props.score;
+
+        if ((isNewRating || movieWasUnrated) && this.state.selectedRating) {
+            addRating(this.props.userId, this.props.movieId, this.state.score, this.props.db);
+        }
+        this.props.hideEditRating();
+    }
+
+    updateModal = (newRatingString) => {
         const newRating = this.stringToRating[newRatingString];
-        addRating(this.props.userId, this.props.movieId, newRating, this.props.db);
         this.setState({
             score: newRating,
-            scoreType: 'Current Rating'
+            scoreType: 'Current Rating',
+            selectedRating: true
         });
     }
 
     render () {
         return (
-            <Box
-                margin="small"
+            <Layer 
+                onEsc={() => this.updateRating()}
+                onClickOutside={() => this.updateRating()}
+                responsive={false}
             >
-                <Heading level={2}>{this.props.name}</Heading>
-                <Text>{this.props.date}</Text>
-                <Text>{this.state.scoreType + ": "}<span style={{color: convertNumToColor(this.state.score)}}>{this.state.score}</span></Text>
-                <Text margin={{'top': 'small'}}>How was the movie?</Text>
-                <RadioButtonGroup
-                    name="doc"
-                    options={['unwatchable', 'bad', 'meh', 'good', 'wow']}
-                    value={this.ratingToString[this.state.score]}
-                    onChange={(event) => this.updateRating(event.target.value)}
-                />
-            </Box>
+                <Box margin="small">
+                    <Heading level={2}>{this.props.name}</Heading>
+                    <Text>{this.props.date}</Text>
+                    <Text>{this.state.scoreType + ": "}<span style={{color: convertNumToColor(this.state.score)}}>{this.state.score}</span></Text>
+                    <Text margin={{'top': 'small'}}>How was the movie?</Text>
+                    <RadioButtonGroup
+                        name="doc"
+                        options={['unwatchable', 'bad', 'meh', 'good', 'wow']}
+                        value={this.state.scoreType === 'Prediction' ? null : this.ratingToString[this.state.score]}
+                        onChange={(event) => this.updateModal(event.target.value)}
+                    />
+                </Box>
+            </Layer>
         );
     }
 }

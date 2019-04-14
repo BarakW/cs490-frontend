@@ -46,6 +46,7 @@ export class UserView extends Component {
             userId={this.userToken.uid}
             movieId={movieId}
             db={this.db}
+            hideEditRating={() => this.setState({showEditRating: false})}
         />;
         this.setState({
             showEditRating: true
@@ -58,7 +59,10 @@ export class UserView extends Component {
         if (!doc.exists) {
             this.userRef.set({
                 email: this.userToken.email,
-                displayName: this.userToken.displayName
+                displayName: this.userToken.displayName,
+                ratings: {},
+                newRecommendations: {},
+                allRecommendations: {}
             }, {merge: true}).catch(console.error);
         } else {
             this.setState({userDoc: doc.data()});
@@ -76,12 +80,7 @@ export class UserView extends Component {
     }
 
     render() {
-        let view = <RecommendationsView
-            userDoc={this.state.userDoc}
-            db={this.db}
-            storageRef={this.storageRef}
-            handleClick={this.showEditRatingOnClick}
-        />;
+        let view;
         if (this.state.showRatingsView) {
             view = <NewRatingsView 
                 db={this.db}
@@ -90,19 +89,18 @@ export class UserView extends Component {
                 movieMap={this.state.movieMap}
                 handleClick={this.showEditRatingOnClick}
             />;
+        } else {
+            view = <RecommendationsView
+                userDoc={this.state.userDoc}
+                db={this.db}
+                storageRef={this.storageRef}
+                handleClick={this.showEditRatingOnClick}
+            />;
         }
 
         return (
             <Box>
-                {this.state.showEditRating &&
-                <Layer 
-                    onEsc={() => this.setState({ showEditRating: false })}
-                    onClickOutside={() => this.setState({ showEditRating: false })}
-                    responsive={false}
-                >
-                    {this.editRatingModal}
-                </Layer>
-                }
+                {this.state.showEditRating && this.editRatingModal}
                 <Heading>Hi, {this.userToken.displayName}</Heading>
                 {view}
                 <Button color="accent-1" margin="xsmall"

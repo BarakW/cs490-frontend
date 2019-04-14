@@ -9,9 +9,9 @@ export class NewRatingsView extends Component {
         super(props);
         this.db = this.props.db;
         this.storageRef = this.props.storageRef;
-        this.ratingsObj = null;
+        this.moviesToFetch = null;
         this.state = {
-            ratedMovies: [],
+            ratedMovies: {},
         };
         
         this.buildMoviesList = this.buildMoviesList.bind(this);
@@ -19,45 +19,57 @@ export class NewRatingsView extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        // make sure we don't create the ratingsObj until we have the users info
-        const userDocHasChanged = JSON.stringify(this.props.userDoc) !== JSON.stringify(prevProps.userDoc) 
-        if (this.props.userDoc && userDocHasChanged) {
-            this.ratingsObj = this.getRatingsFromUser();
-            // TODO: only rerender the movie that has changed. this is going to rerender everything.
-            this.setState({ratedMovies: []});
-            this.getMoviesForUser(this.ratingsObj);
+        // make sure we don't create the moviesToFetch until we have the users info
+        const userDocHasChanged = this.props.userDoc && 
+            JSON.stringify(this.props.userDoc.ratings) !== JSON.stringify(prevProps.userDoc.ratings)
+        if (userDocHasChanged) {
+            this.moviesToFetch = this.getRatingsFromUser();
+            this.getMoviesForUser(this.moviesToFetch);
         }
     }
 
     componentDidMount () {
         // when doc is first mounted, fetch movies
         if (this.props.userDoc) {
-            this.ratingsObj = this.getRatingsFromUser();
-            this.getMoviesForUser(this.ratingsObj);
+            this.moviesToFetch = this.getRatingsFromUser();
+            this.getMoviesForUser(this.moviesToFetch);
         }
     }
 
-    // create ratings object we can use to build up movie cards
+    // fetch resources for movies that are not in state
     getRatingsFromUser() {
-        let ratings = {}
+        const moviesToFetch = {};
+        const moviesWithNewRatings = {};
+
         for (let movieId in this.props.userDoc.ratings) {
-            ratings[movieId] = {
-                id: movieId, 
-                score: this.props.userDoc.ratings[movieId]
-            };
+            const movieScore = this.props.userDoc.ratings[movieId];
+            let movieInState = this.state.ratedMovies[movieId];
+
+            if (movieInState) {
+                movieInState = Object.assign({}, movieInState);
+                movieInState.score = movieScore;
+                moviesWithNewRatings[movieId] = movieInState;
+            } else {
+                moviesToFetch[movieId] = {
+                    id: movieId, 
+                    score: movieScore
+                };
+            }
         }
-        return ratings;
+
+        this.setState({ratedMovies: moviesWithNewRatings});
+        return moviesToFetch;
     }
 
     // get info about each movie we want to recommend to the user
-    getMoviesForUser (ratingsObj) {
-        for (let movieId in ratingsObj) {
+    getMoviesForUser (moviesToFetch) {
+        for (let movieId in moviesToFetch) {
             getMovieDoc(
                 movieId,
                 this.db,
                 this.addMovieMetadata,
                 {
-                    movieObj: ratingsObj[movieId],
+                    movieObj: moviesToFetch[movieId],
                 }
             );  
         }
@@ -81,7 +93,8 @@ export class NewRatingsView extends Component {
         const { movieObj } = args;
         movieObj.posterURL = posterURL;
 
-        let ratedMovies = [...this.state.ratedMovies, movieObj];
+        const ratedMovies = Object.assign({}, this.state.ratedMovies);
+        ratedMovies[movieObj.id] = movieObj
         this.setState({ratedMovies});
     }
 
@@ -97,7 +110,7 @@ export class NewRatingsView extends Component {
                 <MovieCarousel
                     scoreType="Current Rating"
                     showScore={true}
-                    movies={this.state.ratedMovies}
+                    movies={Object.values(this.state.ratedMovies)}
                     handleClick={this.props.handleClick}
                 />
             </Box>

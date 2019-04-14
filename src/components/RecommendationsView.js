@@ -8,10 +8,10 @@ export class RecommendationsView extends Component {
         super(props);
         this.db = this.props.db;
         this.storageRef = this.props.storageRef;
-        this.recommendationsObj = null;
+        this.moviesToFetch = null;
         this.state = {
-            newMovies: [],
-            allMovies: []
+            newMovies: {},
+            allMovies: {}
         };
         
         this.buildMoviesList = this.buildMoviesList.bind(this);
@@ -19,64 +19,91 @@ export class RecommendationsView extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        // make sure we don't create the recommendationsObj until we have the users info
+        // make sure we don't create the moviesToFetch until we have the users info
         const userDocHasChanged = JSON.stringify(this.props.userDoc) !== JSON.stringify(prevProps.userDoc) 
         if (this.props.userDoc && userDocHasChanged) {
-            this.recommendationsObj = this.getRecsFromUser();
-            // TODO: only rerender the movie that has changed. this is going to rerender everything.
-            this.setState({newMovies: [], allMovies: []});
-            this.getMoviesForUser(this.recommendationsObj);
+            this.moviesToFetch = this.getRecsFromUser();
+            this.getMoviesForUser(this.moviesToFetch);
         }
     }
 
     componentDidMount () {
         if (this.props.userDoc) {
-            this.recommendationsObj = this.getRecsFromUser();
-            this.getMoviesForUser(this.recommendationsObj);
+            this.moviesToFetch = this.getRecsFromUser();
+            this.getMoviesForUser(this.moviesToFetch);
         }
     }
 
-    // create recommendations object we can use to build up movie cards
+    // fetch resources for movies that are not in current state
     getRecsFromUser() {
-        let recs = {
-            newRecommendations: {},
-            allRecommendations: {}
+        const moviesToFetch = {
+            newMovies: {},
+            allMovies: {}
         }
+        const moviesWithNewRatings = {
+            newMovies: {},
+            allMovies: {}
+        }
+
         for (let movieId in this.props.userDoc.newRecommendations) {
-            recs.newRecommendations[movieId] = {
-                id: movieId, 
-                score: this.props.userDoc.newRecommendations[movieId]
-            };
+            const movieScore = this.props.userDoc.newRecommendations[movieId];
+            let movieInState = this.state.newMovies[movieId];
+
+            if (movieInState) {
+                movieInState = Object.assign({}, movieInState);
+                movieInState.score = movieScore;
+                moviesWithNewRatings.newMovies[movieId] = movieInState;
+            } else {
+                moviesToFetch.newMovies[movieId] = {
+                    id: movieId, 
+                    score: movieScore
+                };
+            }
         }
+
         for (let movieId in this.props.userDoc.allRecommendations) {
-            recs.allRecommendations[movieId] = {
-                id: movieId, 
-                score: this.props.userDoc.allRecommendations[movieId]
-            };
+            const movieScore = this.props.userDoc.allRecommendations[movieId];
+            let movieInState = this.state.allMovies[movieId];
+
+            if (movieInState) {
+                movieInState = Object.assign({}, movieInState);
+                movieInState.score = movieScore;
+                moviesWithNewRatings.allMovies[movieId] = movieInState;
+            } else {
+                moviesToFetch.allMovies[movieId] = {
+                    id: movieId, 
+                    score: movieScore
+                };
+            }
         }
-        return recs;
+
+        this.setState({
+            newMovies: moviesWithNewRatings.newMovies,
+            allMovies: moviesWithNewRatings.allMovies
+        });
+        return moviesToFetch;
     }
 
     // get info about each movie we want to recommend to the user
-    getMoviesForUser (recsObj) {
-        for (let movieId in recsObj.newRecommendations) {
+    getMoviesForUser (moviesToFetch) {
+        for (let movieId in moviesToFetch.newMovies) {
             getMovieDoc(
                 movieId,
                 this.db,
                 this.addMovieMetadata,
                 {
-                    movieObj: recsObj.newRecommendations[movieId],
+                    movieObj: moviesToFetch.newMovies[movieId],
                     isNewMovie: true
                 }
             );  
         }
-        for (let movieId in recsObj.allRecommendations) {
+        for (let movieId in moviesToFetch.allMovies) {
             getMovieDoc(
                 movieId,
                 this.db,
                 this.addMovieMetadata,
                 {
-                    movieObj: recsObj.allRecommendations[movieId],
+                    movieObj: moviesToFetch.allMovies[movieId],
                     isNewMovie: false
                 }
             ); 
@@ -103,10 +130,12 @@ export class RecommendationsView extends Component {
 
         // check if movie is new so we can add it to the correct list
         if (isNewMovie) {
-            let newMovies = [...this.state.newMovies, movieObj];
+            const newMovies = Object.assign({}, this.state.newMovies);
+            newMovies[movieObj.id] = movieObj
             this.setState({newMovies});
         } else {
-            let allMovies = [...this.state.allMovies, movieObj];
+            const allMovies = Object.assign({}, this.state.allMovies);
+            allMovies[movieObj.id] = movieObj
             this.setState({allMovies});
         }
     }
@@ -118,14 +147,14 @@ export class RecommendationsView extends Component {
                 <MovieCarousel
                     scoreType="Prediction"
                     showScore={true}
-                    movies={this.state.newMovies}
+                    movies={Object.values(this.state.newMovies)}
                     handleClick={this.props.handleClick}
                 />
                 <Heading>All Movies</Heading>
                 <MovieCarousel
                     scoreType="Prediction"
                     showScore={true}
-                    movies={this.state.allMovies}
+                    movies={Object.values(this.state.allMovies)}
                     handleClick={this.props.handleClick}
                 />
             </Box>
