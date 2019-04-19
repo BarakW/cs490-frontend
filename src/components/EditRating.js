@@ -26,15 +26,15 @@ export class EditRating extends Component {
         this.state = {
             score: this.props.score,
             scoreType: this.props.scoreType,
-            selectedRating: false
+            selectedRating: false,
+            movieWasUnrated: this.props.scoreType === 'Prediction'
         }
     }
 
     updateRating = () => {
-        const movieWasUnrated = this.state.score && this.state.scoreType === 'Prediction';
         const isNewRating = this.state.score !== this.props.score;
 
-        if ((isNewRating || movieWasUnrated) && this.state.selectedRating) {
+        if ((isNewRating || this.state.movieWasUnrated) && this.state.selectedRating) {
             addRating(this.props.userId, this.props.movieId, this.state.score, this.props.db);
         }
         this.props.hideEditRating();
